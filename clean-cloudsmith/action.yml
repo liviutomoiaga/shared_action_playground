@@ -1,0 +1,37 @@
+name: 'Clean Cloudsmith'
+description: 'Delete artifacts from Cloudsmith repository'
+
+inputs:
+  repo:
+    description: 'Cloudsmith repository name'
+    required: true
+    default: 'sdg-linux'
+  method:
+    description: 'Cloudsmith helper method to execute'
+    required: true
+    default: 'remove_item_from_location'
+  package_version:
+    description: 'Package version pattern to match'
+    required: true
+  package_name:
+    description: 'Package name pattern to match'
+    required: true
+    default: '*'
+  cloudsmith_api_key:
+    description: 'Cloudsmith API key'
+    required: true
+
+runs:
+  using: 'composite'
+  steps:
+    - name: Delete artifacts from Cloudsmith
+      shell: bash
+      env:
+        CLOUDSMITH_API_KEY: ${{ inputs.cloudsmith_api_key }}
+      run: |
+        curl -sO https://raw.githubusercontent.com/analogdevicesinc/wiki-scripts/main/utils/cloudsmith_utils/cloudsmith_helper.py
+        python cloudsmith_helper.py \
+          --repo "${{ inputs.repo }}" \
+          --method "${{ inputs.method }}" \
+          --package_version "${{ inputs.package_version }}" \
+          --package_name "${{ inputs.package_name }}"

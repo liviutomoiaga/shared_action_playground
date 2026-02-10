@@ -1,0 +1,41 @@
+name: Test Clean Cloudsmith Action
+
+on:
+  workflow_dispatch:
+    inputs:
+      repo:
+        description: 'Cloudsmith repository name'
+        required: true
+        default: 'sdg-linux'
+        type: string
+      method:
+        description: 'Cloudsmith helper method to execute'
+        required: true
+        default: 'remove_item_from_location'
+        type: string
+      package_version:
+        description: 'Package version pattern to match'
+        required: true
+        type: string
+      package_name:
+        description: 'Package name pattern to match'
+        required: true
+        default: '*'
+        type: string
+
+jobs:
+  clean-cloudsmith:
+    runs-on: [self-hosted, repo-only]
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Run Clean Cloudsmith Action
+        uses: ./clean-cloudsmith
+        with:
+          repo: ${{ inputs.repo }}
+          method: ${{ inputs.method }}
+          package_version: ${{ inputs.package_version }}
+          package_name: ${{ inputs.package_name }}
+          cloudsmith_api_key: ${{ secrets.CLOUDSMITH_API_KEY }}
